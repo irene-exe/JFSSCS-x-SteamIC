@@ -1,5 +1,6 @@
 import cv2
 import time
+import os
 
 cap = cv2.VideoCapture(0)
 
@@ -16,6 +17,7 @@ out = None
 
 recording = False
 video = 0
+start_time = 0
 
 while True:
     diff = cv2.absdiff(frame_1, frame_2)
@@ -35,8 +37,9 @@ while True:
     if (area):
         cv2.putText(frame_1, "Status: {}".format("Movement"), (10, 20), cv2.FONT_HERSHEY_PLAIN, 1, (255, 0, 0), 2)
         if (not recording):
-            out = cv2.VideoWriter(str(video)+"output.mp4", fourcc, 60.0, (frameWidth, frameHeight))
+            out = cv2.VideoWriter(str(video) + "output.mp4", fourcc, 20.0, (frameWidth, frameHeight))
             recording = True
+            start_time = time.time()
         if recording and out is not None:
             out.write(frame_1)
     else:
@@ -44,8 +47,14 @@ while True:
         if (recording):
             if out:
                 out.release()
-                video+=1
                 recording = False
+                duration = time.time() - start_time
+                print(duration)
+                if duration < 3:
+                    if (str(video) + "output.mp4" and os.path.exists(str(video) + "output.mp4")):
+                        os.remove(str(video) + "output.mp4")
+                else:
+                    video+=1
             out = None
     #cv2.drawContours(frame_1, contour, -1, (0, 255, 0), 2)
     
